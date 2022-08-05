@@ -146,16 +146,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Common.cpp" />
+    <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="Image.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MapTile.cpp" />
     <ClCompile Include="Pixel.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Screen.cpp" />
+    <ClCompile Include="Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Drawable.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="MapTile.h" />
     <ClInclude Include="Pixel.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Screen.h" />
+    <ClInclude Include="Sprite.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

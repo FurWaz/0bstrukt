@@ -34,6 +34,16 @@ public:
 		this->color = sf::Color(red, green, blue);
 	}
 
+	void copyColor(Pixel p)
+	{
+		this->color = p.color;
+	}
+
+	void MixPixel(Pixel second, float factor = 0.5f)
+	{
+		this->copyColor(Pixel::MixPixels(*this, second, factor));
+	}
+
 	void setColor(unsigned int red, unsigned int green, unsigned int blue) { this->setColor(sf::Color(red, green, blue)); }
 	void setColor(sf::Color color)
 	{

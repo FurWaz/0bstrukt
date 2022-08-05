@@ -30,14 +30,14 @@ private:
 	unsigned int maxDefinition = 64u;
 	float windowSpeed = 4.f;
 
-	void setWindowPosition(sf::Vector2i pos)
+	bool setWindowPosition(sf::Vector2i pos)
 	{
 		if (pos.x == this->position.x && pos.y == this->position.y)
-			return;
+			return false;
 
-		window.setPosition(pos);
 		this->windowScenePart.left = (pos.x - this->sceneScreenRect.left) / blockToPixelRatio;
 		this->windowScenePart.top = (pos.y - this->sceneScreenRect.top) / blockToPixelRatio;
+		return true;
 	}
 
 public:
@@ -52,7 +52,7 @@ public:
 		window.setVerticalSyncEnabled(true);
 
 		this->position = sf::Vector2f(window.getPosition().x, window.getPosition().y);
-		backgroundColor = sf::Color::Black;
+		backgroundColor = sf::Color(0, 0, 0, 0);
 
 		this->setPosition(0, 0);
 		clock.restart();
@@ -90,6 +90,7 @@ public:
 	}
 
 	void setSceneTargetPosition(float x, float y) { this->setSceneTargetPosition(sf::Vector2f(x, y)); }
+	void setSceneTargetPosition(sf::Vector2i pos) { this->setSceneTargetPosition(sf::Vector2f(pos.x, pos.y)); }
 	void setSceneTargetPosition(sf::Vector2f pos)
 	{
 		this->setTargetPosition(this->sceneScreenRect.left + blockToPixelRatio * pos.x, this->sceneScreenRect.top + blockToPixelRatio * pos.y);
@@ -132,7 +133,7 @@ public:
 		this->windowScenePart.height = this->windowDefinition.y;
 
 		this->size = sf::Vector2u(windowDefinition.x * blockToPixelRatio, windowDefinition.y * blockToPixelRatio);
-		window.create(sf::VideoMode(this->size.x, this->size.y), this->name, sf::Style::None);
+		window.create(sf::VideoMode(this->size.x, this->size.y), this->name);
 	}
 
 	void processEvents()
@@ -172,6 +173,12 @@ public:
 	{
 		window.clear(this->backgroundColor);
 
+		sf::Vector2i newPosition = sf::Vector2i(
+			std::round(this->position.x / blockToPixelRatio) * blockToPixelRatio,
+			std::round(this->position.y / blockToPixelRatio) * blockToPixelRatio
+		);
+		bool shouldUpdatePosition = this->setWindowPosition(newPosition);
+
 		if (this->targetScene != nullptr) // render current scene
 		{
 			int nbBlocks = this->windowDefinition.x * this->windowDefinition.y;
@@ -187,10 +194,7 @@ public:
 			}
 		}
 
-		this->setWindowPosition(sf::Vector2i(
-			std::round(this->position.x / blockToPixelRatio) * blockToPixelRatio,
-			std::round(this->position.y / blockToPixelRatio) * blockToPixelRatio
-		));
 		window.display();
+		if (shouldUpdatePosition) window.setPosition(newPosition);
 	}
 };

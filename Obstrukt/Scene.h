@@ -6,35 +6,26 @@
 class Scene
 {
 private:
+	static Scene* currentScene;
+
 	Pixel* pixels;
 
 public:
+	static Scene* getCurrentScene();
+
 	sf::Vector2u size;
 	unsigned int length;
 
-	Scene(sf::Vector2u size)
-	{
-		this->size = size;
-		this->length = size.x * size.y;
-		this->pixels = (Pixel*) malloc(this->length * sizeof(unsigned int));
-		for (int i = 0; i < this->length; i++)
-			this->pixels[i].setColor(sf::Color::Black);
-	}
+	Scene(sf::Vector2u);
 
-	Pixel* getPixelAt(unsigned int x, unsigned int y) { return this->getPixelAt(sf::Vector2u(x, y)); }
-	Pixel* getPixelAt(sf::Vector2u pos)
-	{
-		if (pos.x > size.x || pos.y > size.y) return nullptr;
-		return &pixels[pos.x + pos.y * size.x];
-	}
+	void setAsCurrentScene();
 
-	Pixel* getPixelsBuffer()
-	{
-		return pixels;
-	}
+	void clear();
 
-	~Scene()
-	{
-		free(pixels);
-	}
+	Pixel* getPixelAt(unsigned int, unsigned int);
+	Pixel* getPixelAt(sf::Vector2u);
+
+	Pixel* getPixelsBuffer();
+
+	~Scene();
 };
