@@ -16,7 +16,7 @@ private:
 	void updateDims()
 	{
 		this->imgSize = img.getSize();
-		this->tilesSize = sf::Vector2u(imgSize.x / size.x, imgSize.y / size.y);
+		this->tilesSize = sf::Vector2u(imgSize.x / size.x - 1, imgSize.y / size.y - 1);
 		this->setCurrentTile(this->currentTile);
 	}
 
@@ -50,28 +50,27 @@ public:
 
 	void setCurrentTile(unsigned int index)
 	{
-		if (tilesSize.x == 0 || tilesSize.y == 0) return;
-		index = std::min(index, tilesSize.x * tilesSize.y);
-		this->currentTile.x = index % tilesSize.x;
-		this->currentTile.y = index / tilesSize.y;
+		index = std::min(index, (tilesSize.x + 1) * (tilesSize.y + 1) - 1);
+		this->currentTile.x = index % (tilesSize.x + 1);
+		this->currentTile.y = index / (tilesSize.x + 1);
 	}
 
 	void setCurrentTile(sf::Vector2u pos)
 	{
-		this->currentTile.x = std::max(pos.x, tilesSize.x - 1);
-		this->currentTile.y = std::max(pos.y, tilesSize.y - 1);
+		this->currentTile.x = std::min(pos.x, tilesSize.x);
+		this->currentTile.y = std::min(pos.y, tilesSize.y);
 	}
 
 	sf::Color getPixelAt(int x, int y) { return this->getPixelAt(sf::Vector2u(x, y)); }
 	sf::Color getPixelAt(sf::Vector2u coord)
 	{
 		if (coord.x > this->size.x || coord.y > this->size.y || coord.x < 0 || coord.y < 0)
-			return sf::Color::Black;
+			return sf::Color::Transparent;
 
 		unsigned int posX = coord.x + currentTile.x * size.x;
 		unsigned int posY = coord.y + currentTile.y * size.y;
 		if (posX > this->imgSize.x || posY > this->imgSize.y || posX < 0 || posY < 0)
-			return sf::Color::Black;
+			return sf::Color::Transparent;
 
 		return img.getPixel(posX, posY);
 	}

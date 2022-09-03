@@ -1,13 +1,18 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Scene.h"
+#include "Map.h"
 #include "Common.h"
 #include <iostream>
 #include <vector>
+#include <Windows.h>
+#pragma comment(lib, "User32")
+#pragma comment(lib, "Gdi32")
 
 class Screen
 {
 private:
+	static Screen* currentScreen;
+
 	sf::Vector2u size;
 	sf::String name;
 	sf::RenderWindow window;
@@ -28,22 +33,59 @@ private:
 	sf::Clock clock;
 
 	unsigned int maxDefinition = 64u;
-	float windowSpeed = 4.f;
+	float windowSpeed = 6.f;
 
 	bool setWindowPosition(sf::Vector2i pos)
 	{
 		if (pos.x == this->position.x && pos.y == this->position.y)
 			return false;
 
-		this->windowScenePart.left = (pos.x - this->sceneScreenRect.left) / blockToPixelRatio;
-		this->windowScenePart.top = (pos.y - this->sceneScreenRect.top) / blockToPixelRatio;
+		this->windowScenePart.left = (pos.x - this->sceneScreenRect.left) / blockToPixelRatio + 0.5f;
+		this->windowScenePart.top = (pos.y - this->sceneScreenRect.top) / blockToPixelRatio + 0.5f;
 		return true;
 	}
 
+	void setShape()
+	{
+		HRGN hRegion = CreateRectRgn(0, 0, window.getSize().x, window.getSize().y);
+
+		for (unsigned int y = 0; y < windowDefinition.y; y++)
+		{
+			for (unsigned int x = 0; x < windowDefinition.x; x++)
+			{
+				bool makeItTrans = false;
+				Pixel* p = targetScene->getPixelAt(windowScenePart.left + x, windowScenePart.top + y);
+				if (p == nullptr) makeItTrans = true;
+				else
+				{
+					sf::Color c = p->getColor();
+					makeItTrans = c.r + c.g + c.b == 0;
+				}
+				if (makeItTrans)
+				{
+					HRGN hRegionPixel = CreateRectRgn(x * blockToPixelRatio, y * blockToPixelRatio, x * blockToPixelRatio + blockToPixelRatio, y * blockToPixelRatio + blockToPixelRatio);
+					CombineRgn(hRegion, hRegion, hRegionPixel, RGN_XOR);
+					DeleteObject(hRegionPixel);
+				}
+			}
+		}
+
+		SetWindowRgn(window.getSystemHandle(), hRegion, true);
+		DeleteObject(hRegion);
+	}
+
 public:
+	static Screen* getCurrentScreen()
+	{
+		return Screen::currentScreen;
+	}
+
 	Screen(sf::String name)
 	{
-		this->monitorMargins = sf::Vector2u(100, 100);
+		currentScreen = this;
+
+		::ShowWindow(GetConsoleWindow(), SW_HIDE);
+		this->monitorMargins = sf::Vector2u(100, 200);
 		this->name = name;
 
 		sf::VideoMode monitor = sf::VideoMode::getDesktopMode();
@@ -58,9 +100,19 @@ public:
 		clock.restart();
 	}
 
+	sf::IntRect getSceneRect()
+	{
+		return (sf::IntRect)windowScenePart;
+	}
+
 	bool isOpen()
 	{
 		return window.isOpen();
+	}
+
+	void close()
+	{
+		window.close();
 	}
 
 	void setPosition(float x, float y) { this->setPosition(sf::Vector2f(x, y)); }
@@ -96,7 +148,7 @@ public:
 		this->setTargetPosition(this->sceneScreenRect.left + blockToPixelRatio * pos.x, this->sceneScreenRect.top + blockToPixelRatio * pos.y);
 	}
 
-	void setTargetScene(Scene* scene)
+	void setTargetScene(Scene* scene = Scene::getCurrentScene())
 	{
 		this->targetScene = scene;
 		float monitorRatio = ((monitorSize.x - monitorMargins.x) / (float) (monitorSize.y - monitorMargins.y));
@@ -111,11 +163,14 @@ public:
 
 		// calculate the scene display position on screen (it's top left corner)
 		blockToPixelRatio = sceneScale;
+		Common::BLOCK_2_PIXEL = blockToPixelRatio;
 
 		sceneScreenRect.width = targetScene->size.x * blockToPixelRatio;
 		sceneScreenRect.height = targetScene->size.y * blockToPixelRatio;
 		sceneScreenRect.left = (monitorSize.x - sceneScreenRect.width) / 2.f;
 		sceneScreenRect.top = (monitorSize.y - sceneScreenRect.height) / 2.f;
+
+		Common::sceneScreenRect = sceneScreenRect;
 
 		// update the window to match the new scene
 		this->updateWindowSize();
@@ -133,7 +188,10 @@ public:
 		this->windowScenePart.height = this->windowDefinition.y;
 
 		this->size = sf::Vector2u(windowDefinition.x * blockToPixelRatio, windowDefinition.y * blockToPixelRatio);
-		window.create(sf::VideoMode(this->size.x, this->size.y), this->name);
+		window.create(sf::VideoMode(this->size.x, this->size.y), this->name, sf::Style::None);
+
+		HWND hwnd = window.getSystemHandle();
+		SetWindowLongPtrW(hwnd, GWL_EXSTYLE, GetWindowLongPtrW(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
 	}
 
 	void processEvents()
@@ -194,6 +252,7 @@ public:
 			}
 		}
 
+		if (!Map::getCurrentMap()->hasPlayer() || true) setShape();
 		window.display();
 		if (shouldUpdatePosition) window.setPosition(newPosition);
 	}

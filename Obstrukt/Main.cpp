@@ -4,40 +4,54 @@
 
 #include "Screen.h"
 #include "Player.h"
-#include "Map.h"
+#include "MapCreator.h"
 
 int main(int argc, char** argv)
 {
 	Screen window("Obstrukt");
-	Scene* scene = new Scene(sf::Vector2u(256, 144));
 
-	Map m("./resources/map.obkt");
-	m.getScene()->setAsCurrentScene();
-	window.setTargetScene(m.getScene());
+	MapCreator::CreateMenuMap();
+	window.setTargetScene();
 
-	Player p;
-
-	float color_shift = 0;
+	Player p(sf::Vector2i(8, 8));
 
 	while (window.isOpen())
 	{
+		if (p.isGameOver())
+		{
+			p.setGameOver(false);
+			MapCreator::CreateGameOverMap();
+			Screen::getCurrentScreen()->setTargetScene();
+		}
+
+		Map* map = Map::getCurrentMap();
 		window.processEvents();
-		window.setSceneTargetPosition(p.getCenter());
+		if (map->hasPlayer())
+			window.setSceneTargetPosition(p.getCenter());
+		else window.setTargetPosition((sf::Vector2f)sf::Mouse::getPosition());
 
 		float dt = window.update();
-		p.update(dt);
+		map->update(dt);
+
+		if (map->hasPlayer())
+			p.update(dt);
 
 		Scene::getCurrentScene()->clear();
-		m.render(dt);
+		if (!p.isFalling()) map->render(dt);
 
-		p.render(dt);
-		scene->getPixelAt((sf::Vector2u)p.getCenter())->setColor(sf::Color::Red);
+		if (map->hasPlayer())
+		{
+			p.render(dt);
+		}
+
+		if (p.isFalling()) map->render(dt);
 
 		window.render();
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 
-	delete scene;
+	MapCreator::deleteOldMaps();
+	delete Map::getCurrentMap();
 	
 	return 0;
 }

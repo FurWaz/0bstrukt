@@ -4,6 +4,9 @@
 
 class Entity
 {
+private:
+
+
 protected:
 	sf::Vector2i position;
 	sf::Vector2i size;
@@ -20,6 +23,12 @@ protected:
 			this->position.x + this->size.x / 2,
 			this->position.y + this->size.y / 2
 		);
+	}
+
+	sf::Vector2u getBlockAt(int x, int y) { return this->getBlockAt(sf::Vector2i(x, y)); }
+	sf::Vector2u getBlockAt(sf::Vector2i pos)
+	{
+		return sf::Vector2u(pos.x / Common::BLOCK_SIZE, pos.y / Common::BLOCK_SIZE);
 	}
 
 public:
@@ -73,5 +82,15 @@ public:
 	void update(float dt)
 	{
 
+	}
+
+	sf::Vector2i getOrigin()
+	{
+		return sf::Vector2i((this->position.x + this->size.x / 2), (this->position.y + this->size.y));
+	}
+
+	sf::Vector2u getCurrentBlock()
+	{
+		return this->getBlockAt(this->getOrigin());
 	}
 };

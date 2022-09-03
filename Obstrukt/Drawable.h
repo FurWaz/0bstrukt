@@ -44,7 +44,7 @@ public:
 	
 	void render(float dt)
 	{
-
+		renderOnScene(Scene::getCurrentScene());
 	}
 };
 

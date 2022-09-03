@@ -9,6 +9,7 @@ Scene* Scene::getCurrentScene()
 
 Scene::Scene(sf::Vector2u size)
 {
+	currentScene = this;
 	this->size = size;
 	this->length = size.x * size.y;
 	this->pixels = (Pixel*)malloc(this->length * sizeof(unsigned int));
@@ -24,7 +25,7 @@ void Scene::setAsCurrentScene()
 void Scene::clear()
 {
 	for (int i = 0; i < this->length; i++)
-		this->pixels[i].setColor(sf::Color::Black);
+		this->pixels[i].setColor(sf::Color::Transparent);
 }
 
 Pixel* Scene::getPixelAt(unsigned int x, unsigned int y)
@@ -45,5 +46,7 @@ Pixel* Scene::getPixelsBuffer()
 
 Scene::~Scene()
 {
-	free(pixels);
+	try {
+		free(pixels);
+	} catch (std::exception e) {}
 }

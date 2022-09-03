@@ -1,11 +1,19 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <SFML/Graphics.hpp>
 
 class Common
 {
 public:
 	static const int BLOCK_SIZE = 8;
+	static sf::FloatRect sceneScreenRect;
+	static float BLOCK_2_PIXEL;
+	static sf::Vector2i playerPosition;
+
+	static void (*quitCallback)();
+
+	void Quit();
 
 	template<class A> static A clamp(A val, A min, A max)
 	{
@@ -32,5 +40,15 @@ public:
 		res.push_back(str.substr(lastpos, length - lastpos));
 
 		return res;
+	}
+
+	template<class T> static T SceneToScreenCoord(T coord)
+	{
+		return T(coord.x * BLOCK_SIZE + sceneScreenRect.left, coord.y * BLOCK_SIZE + sceneScreenRect.top);
+	}
+
+	template<class T> static T ScreenToSceneCoord(T coord)
+	{
+		return T((coord.x - sceneScreenRect.left) / BLOCK_2_PIXEL, (coord.y - sceneScreenRect.top) / (float)BLOCK_2_PIXEL);
 	}
 };

@@ -145,6 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Callback.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -154,11 +156,17 @@
     <ClCompile Include="MapTile.cpp" />
     <ClCompile Include="Pixel.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Prop.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="MapCreator.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="Title.cpp" />
+    <ClCompile Include="UIElement.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="Callback.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="Entity.h" />
@@ -167,9 +175,13 @@
     <ClInclude Include="MapTile.h" />
     <ClInclude Include="Pixel.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Prop.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="MapCreator.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="Title.h" />
+    <ClInclude Include="UIElement.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
